@@ -11,9 +11,37 @@ type alias Input a =
     }
 
 
+type alias Point =
+    { x : Float
+    , y : Float
+    }
+
+
 downSample : Input a -> List a
 downSample input =
     let
+        x : a -> Float
+        x =
+            input.xGetter
+
+        y : a -> Float
+        y =
+            input.yGetter
+
+        area : a -> a -> Point -> Float
+        area a b c =
+            -- Area of the triangle with the three points as its corners
+            abs (x a * (y b - c.y) + x b * (c.y - y a) + c.x * (y a - y b)) / 2
+
+        avg : List a -> Point
+        avg list_ =
+            let
+                listAverage list acc =
+                    List.sum (List.map acc list)
+                        / toFloat (List.length list)
+            in
+            Point (listAverage list_ x) (listAverage list_ y)
+
         phase1 : a -> List a -> List a
         phase1 first tail =
             case List.Extra.unconsLast tail of
@@ -29,7 +57,29 @@ downSample input =
 
         phase2 : List (List a) -> List a
         phase2 bucketList =
-            []
+            let
+                iter : a -> List a -> List a -> List (List a) -> List a
+                iter previous current next rest =
+                    let
+                        selected =
+                            List.Extra.maximumBy
+                                (\j -> area previous j (avg next))
+                                current
+                                |> Maybe.withDefault previous
+                    in
+                    case rest of
+                        head :: tail ->
+                            selected :: iter selected next head tail
+
+                        [] ->
+                            selected :: next
+            in
+            case bucketList of
+                [ first ] :: current :: next :: rest ->
+                    iter first current next rest
+
+                _ ->
+                    []
     in
     if input.thresold <= 0 then
         []
@@ -50,15 +100,6 @@ downSample input =
 
             [] ->
                 []
-
-
-ceilingDivide : List a -> Int -> Int
-ceilingDivide list divisor =
-    (List.length list
-        |> toFloat
-    )
-        / toFloat divisor
-        |> ceiling
 
 
 splitIn : Int -> List a -> List (List a)
@@ -90,3 +131,12 @@ splitIn nParts list_ =
                     [ list ]
         in
         chunks partLength list_
+
+
+ceilingDivide : List a -> Int -> Int
+ceilingDivide list divisor =
+    (List.length list
+        |> toFloat
+    )
+        / toFloat divisor
+        |> ceiling
