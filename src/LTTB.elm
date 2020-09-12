@@ -17,8 +17,8 @@ type alias Point =
     }
 
 
-downSample : Input a -> List a
-downSample input =
+downsample : Input a -> List a
+downsample input =
     let
         x : a -> Float
         x =
@@ -30,7 +30,7 @@ downSample input =
 
         area : a -> a -> Point -> Float
         area a b c =
-            -- Area of the triangle with the three points as its corners
+            -- Area of a triangle with the three points as its corners
             abs (x a * (y b - c.y) + x b * (c.y - y a) + c.x * (y a - y b)) / 2
 
         avg : List a -> Point
@@ -76,7 +76,7 @@ downSample input =
             in
             case bucketList of
                 [ first ] :: current :: next :: rest ->
-                    iter first current next rest
+                    first :: iter first current next rest
 
                 _ ->
                     []

@@ -2,14 +2,105 @@ module Example exposing (..)
 
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
-import LTTB
+import LTTB exposing (Input, Point)
 import Test exposing (..)
 
 
 suite : Test
 suite =
     describe "The LTTB module"
-        [ describe "LTTB.splitIn"
+        [ describe "LTTB.downsample"
+            [ test "Output has the right shape" <|
+                \_ ->
+                    let
+                        input =
+                            { data =
+                                [ Point 1.0 3.9
+                                , Point 3.3 45.98
+                                , Point 3.3 45.98
+                                , Point 93.3 23.98
+                                ]
+                            , thresold = 3
+                            , xGetter = .x
+                            , yGetter = .y
+                            }
+                    in
+                    LTTB.downsample input
+                        |> Expect.equal
+                            [ Point 1.0 3.9
+                            , Point 3.3 45.98
+                            , Point 93.3 23.98
+                            ]
+            ]
+        , test "Threshold higher than list length returns list" <|
+            \_ ->
+                let
+                    input =
+                        { data =
+                            [ Point 1.0 3.9
+                            , Point 3.3 45.98
+                            ]
+                        , thresold = 3
+                        , xGetter = .x
+                        , yGetter = .y
+                        }
+                in
+                LTTB.downsample input
+                    |> Expect.equal
+                        [ Point 1.0 3.9
+                        , Point 3.3 45.98
+                        ]
+        , test "Threshold equal to list length returns list" <|
+            \_ ->
+                let
+                    input =
+                        { data =
+                            [ Point 1.0 3.9
+                            , Point 3.3 45.98
+                            , Point 3.3 45.98
+                            , Point 93.3 23.98
+                            ]
+                        , thresold = 4
+                        , xGetter = .x
+                        , yGetter = .y
+                        }
+                in
+                LTTB.downsample input
+                    |> Expect.equal
+                        [ Point 1.0 3.9
+                        , Point 3.3 45.98
+                        , Point 3.3 45.98
+                        , Point 93.3 23.98
+                        ]
+        , test "Simple triangle test" <|
+            \_ ->
+                let
+                    input =
+                        { data =
+                            [ Point 0.0 0.0
+                            , Point 1.0 0.0
+                            , Point 2.0 -10.0
+                            , Point 3.0 1.0
+                            , Point 4.0 0.0
+                            , Point 5.0 0.0
+                            , Point 6.0 0.0
+                            , Point 7.0 -1.0
+                            , Point 8.0 10.0
+                            , Point 9.0 0.0
+                            ]
+                        , thresold = 4
+                        , xGetter = .x
+                        , yGetter = .y
+                        }
+                in
+                LTTB.downsample input
+                    |> Expect.equal
+                        [ Point 0.0 0.0
+                        , Point 2.0 -10.0
+                        , Point 8.0 10.0
+                        , Point 9.0 0.0
+                        ]
+        , describe "LTTB.splitIn"
             [ test "List of empty list on nParts = 0" <|
                 \_ ->
                     LTTB.splitIn 0 [ 3, 9, 5 ]
@@ -30,6 +121,10 @@ suite =
                 \_ ->
                     LTTB.splitIn 3 [ 1, 2, 3, 4, 11, 12, 13, 14, 21, 22 ]
                         |> Expect.equal [ [ 1, 2, 3, 4 ], [ 11, 12, 13, 14 ], [ 21, 22 ] ]
+            , test "Split in one returns same list but inside a list" <|
+                \_ ->
+                    LTTB.splitIn 1 [ 1, 2, 3, 4, 11, 12, 13, 14, 21, 22 ]
+                        |> Expect.equal [ [ 1, 2, 3, 4, 11, 12, 13, 14, 21, 22 ] ]
             , test "Split another long list in just 2 parts" <|
                 \_ ->
                     LTTB.splitIn 2 [ 1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15 ]
