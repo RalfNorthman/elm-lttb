@@ -21,8 +21,8 @@ pointList =
     Fuzz.list point
 
 
-thresold : Fuzzer Int
-thresold =
+threshold : Fuzzer Int
+threshold =
     Fuzz.intRange 1 10
 
 
@@ -30,12 +30,12 @@ suite : Test
 suite =
     describe "The LTTB module"
         [ describe "LTTB.downsample"
-            [ fuzz2 pointList thresold "Output has the right shape - fuzz version" <|
+            [ fuzz2 pointList threshold "Output has the right length" <|
                 \fuzzList fuzzInt ->
                     let
                         input =
                             { data = fuzzList
-                            , thresold = fuzzInt
+                            , threshold = fuzzInt
                             , xGetter = .x
                             , yGetter = .y
                             }
@@ -57,7 +57,7 @@ suite =
                             , Point 3.3 45.98
                             , Point 93.3 23.98
                             ]
-                        , thresold = 3
+                        , threshold = 3
                         , xGetter = .x
                         , yGetter = .y
                         }
@@ -76,7 +76,7 @@ suite =
                             [ Point 1.0 3.9
                             , Point 3.3 45.98
                             ]
-                        , thresold = 3
+                        , threshold = 3
                         , xGetter = .x
                         , yGetter = .y
                         }
@@ -96,7 +96,7 @@ suite =
                             , Point 3.3 45.98
                             , Point 93.3 23.98
                             ]
-                        , thresold = 4
+                        , threshold = 4
                         , xGetter = .x
                         , yGetter = .y
                         }
@@ -124,7 +124,7 @@ suite =
                             , Point 8.0 10.0
                             , Point 9.0 0.0
                             ]
-                        , thresold = 4
+                        , threshold = 4
                         , xGetter = .x
                         , yGetter = .y
                         }

@@ -5,7 +5,7 @@ import List.Extra
 
 type alias Input a =
     { data : List a
-    , thresold : Int
+    , threshold : Int
     , xGetter : a -> Float
     , yGetter : a -> Float
     }
@@ -49,16 +49,16 @@ downsample input =
                     []
 
                 Just ( last, middle ) ->
-                    if input.thresold == 1 then
+                    if input.threshold == 1 then
                         [ first ]
 
-                    else if input.thresold == 2 then
+                    else if input.threshold == 2 then
                         [ first, last ]
 
                     else
                         phase2
                             ([ first ]
-                                :: splitIn (input.thresold - 2) middle
+                                :: splitIn (input.threshold - 2) middle
                                 ++ [ [ last ] ]
                             )
 
@@ -88,10 +88,10 @@ downsample input =
                 _ ->
                     []
     in
-    if input.thresold <= 0 then
+    if input.threshold <= 0 then
         []
 
-    else if List.length input.data <= input.thresold then
+    else if List.length input.data <= input.threshold then
         input.data
 
     else
@@ -103,7 +103,7 @@ downsample input =
                 [ a ]
 
             [ a, _, c ] ->
-                if input.thresold >= 2 then
+                if input.threshold >= 2 then
                     [ a, c ]
 
                 else
