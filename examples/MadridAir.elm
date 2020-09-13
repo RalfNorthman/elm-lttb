@@ -76,34 +76,18 @@ myFilter acc day =
             (\r -> between from to r.date)
 
 
-recordsNO : List Record
-recordsNO =
+records : List Record
+records =
     myFilter .no 15
 
 
-downsampledRecordsNO : Int -> List Record
-downsampledRecordsNO threshold =
+downsampledRecords : Int -> List Record
+downsampledRecords threshold =
     LTTB.downsample
-        { data = recordsNO
+        { data = records
         , threshold = threshold
         , xGetter = .date >> posixToMillis >> toFloat
         , yGetter = .no >> Maybe.withDefault 0
-        }
-
-
-recordsSO2 : List Record
-recordsSO2 =
-    --    myFilter .so_2 30
-    myFilter .so_2 120
-
-
-downsampledRecordsSO2 : Int -> List Record
-downsampledRecordsSO2 threshold =
-    LTTB.downsample
-        { data = recordsSO2
-        , threshold = threshold
-        , xGetter = .date >> posixToMillis >> toFloat
-        , yGetter = .so_2 >> Maybe.withDefault 0
         }
 
 
@@ -112,16 +96,14 @@ downsampledRecordsSO2 threshold =
 
 
 type alias Model =
-    { plotNO : Plot.State Record
-    , plotSO2 : Plot.State Record
+    { plot : Plot.State Record
     , threshold : Int
     }
 
 
 init : ( Model, Cmd msg )
 init =
-    ( { plotNO = Plot.init
-      , plotSO2 = Plot.init
+    ( { plot = Plot.init
       , threshold = 100
       }
     , Cmd.none
@@ -132,24 +114,16 @@ init =
 ---- UPDATE ----
 
 
-type MyPlot
-    = PlotNO
-    | PlotSO2
-
-
 type Msg
-    = ToPlot MyPlot (Plot.Msg Record)
+    = ToPlot (Plot.Msg Record)
     | ThresholdSlider Int
 
 
 update : Msg -> Model -> ( Model, Cmd msg )
 update msg model =
     case msg of
-        ToPlot PlotNO plotMsg ->
-            ( { model | plotNO = Plot.update plotMsg model.plotNO }, Cmd.none )
-
-        ToPlot PlotSO2 plotMsg ->
-            ( { model | plotSO2 = Plot.update plotMsg model.plotSO2 }, Cmd.none )
+        ToPlot plotMsg ->
+            ( { model | plot = Plot.update plotMsg model.plot }, Cmd.none )
 
         ThresholdSlider value ->
             ( { model | threshold = value }, Cmd.none )
@@ -167,25 +141,25 @@ myPlotHeight =
     600
 
 
-plotNO : Model -> Element Msg
-plotNO model =
+plot : Model -> Element Msg
+plot model =
     Plot.custom
         { lines =
             [ LineChart.line
                 Colors.blue
                 Dots.circle
                 ""
-                recordsNO
+                records
             , LineChart.line
                 Colors.purple
                 Dots.circle
                 ""
-                (downsampledRecordsNO model.threshold)
+                (downsampledRecords model.threshold)
             ]
-        , toMsg = ToPlot PlotNO
+        , toMsg = ToPlot
         , xAcc = .date >> posixToMillis >> toFloat
         , yAcc = .no >> Maybe.withDefault 0
-        , pointDecoder = pointDecoderNO
+        , pointDecoder = pointDecoder
         }
         |> Plot.width myPlotWidth
         |> Plot.height myPlotHeight
@@ -196,49 +170,12 @@ plotNO model =
         |> Plot.yAxisLabel "NO [μg/m³]"
         |> Plot.yAxisLabelOffsetX 30
         |> Plot.yAxisLabelOffsetY -5
-        |> Plot.draw model.plotNO
+        |> Plot.draw model.plot
 
 
-pointDecoderNO : Point -> Record
-pointDecoderNO { x, y } =
+pointDecoder : Point -> Record
+pointDecoder { x, y } =
     Record (x |> round |> millisToPosix) Nothing Nothing Nothing Nothing Nothing (Just y) Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing 0
-
-
-plotSO2 : Model -> Element Msg
-plotSO2 model =
-    Plot.custom
-        { lines =
-            [ LineChart.line
-                Colors.purple
-                Dots.circle
-                ""
-                recordsSO2
-            , LineChart.line
-                Colors.blue
-                Dots.circle
-                ""
-                (downsampledRecordsSO2 model.threshold)
-            ]
-        , toMsg = ToPlot PlotSO2
-        , xAcc = .date >> posixToMillis >> toFloat
-        , yAcc = .so_2 >> Maybe.withDefault 0
-        , pointDecoder = pointDecoderSO2
-        }
-        |> Plot.width myPlotWidth
-        |> Plot.height myPlotHeight
-        |> Plot.xIsTime True
-        |> Plot.marginLeft 70
-        |> Plot.marginRight 40
-        |> Plot.marginTop 50
-        |> Plot.yAxisLabel "SO₂ [μg/m³]"
-        |> Plot.yAxisLabelOffsetX 35
-        |> Plot.yAxisLabelOffsetY -20
-        |> Plot.draw model.plotSO2
-
-
-pointDecoderSO2 : Point -> Record
-pointDecoderSO2 { x, y } =
-    Record (x |> round |> millisToPosix) Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing (Just y) Nothing Nothing 0
 
 
 thresholdSlider : Model -> Element Msg
@@ -260,7 +197,7 @@ thresholdSlider model =
                 [ Font.color darkGrey ]
             <|
                 paragraph []
-                    [ colorPoints blue (List.length recordsNO)
+                    [ colorPoints blue (List.length records)
                     , text " downsampled to "
                     , colorPoints purple model.threshold
                     , text ":"
@@ -320,7 +257,7 @@ view model =
             , height fill
             ]
             [ titleLink
-            , el [ centerX ] <| plotNO model
+            , el [ centerX ] <| plot model
             , el [ Font.size 14, centerX ]
                 (text "Drag a rectangle in the plot to zoom in, click to zoom out.")
             , row [ centerX, width fill ]
