@@ -21,16 +21,11 @@ pointList =
     Fuzz.list point
 
 
-threshold : Fuzzer Int
-threshold =
-    Fuzz.intRange 1 10
-
-
 suite : Test
 suite =
     describe "The LTTB module"
         [ describe "LTTB.downsample"
-            [ fuzz2 pointList threshold "Output has the right length" <|
+            [ fuzz2 pointList Fuzz.int "Output has the right length" <|
                 \fuzzList fuzzInt ->
                     let
                         input =
@@ -41,7 +36,7 @@ suite =
                             }
 
                         expectedLength =
-                            min (List.length fuzzList) fuzzInt
+                            max 0 (min (List.length fuzzList) fuzzInt)
                     in
                     LTTB.downsample input
                         |> List.length
