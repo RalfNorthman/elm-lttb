@@ -172,12 +172,12 @@ plotNO model =
     Plot.custom
         { lines =
             [ LineChart.line
-                Colors.purple
+                Colors.blue
                 Dots.circle
                 ""
                 recordsNO
             , LineChart.line
-                Colors.blue
+                Colors.purple
                 Dots.circle
                 ""
                 (downsampledRecordsNO model.threshold)
@@ -191,10 +191,11 @@ plotNO model =
         |> Plot.height myPlotHeight
         |> Plot.xIsTime True
         |> Plot.marginLeft 70
-        |> Plot.marginRight 40
+        |> Plot.marginRight 70
+        |> Plot.marginTop 50
         |> Plot.yAxisLabel "NO [μg/m³]"
         |> Plot.yAxisLabelOffsetX 30
-        |> Plot.yAxisLabelOffsetY -15
+        |> Plot.yAxisLabelOffsetY -5
         |> Plot.draw model.plotNO
 
 
@@ -242,15 +243,27 @@ pointDecoderSO2 { x, y } =
 
 thresholdSlider : Model -> Element Msg
 thresholdSlider model =
+    let
+        blue =
+            rgb255 3 169 244
+
+        purple =
+            rgb255 156 39 176
+
+        colorPoints color int =
+            el [ Font.color color, Font.bold ] <|
+                text (String.fromInt int ++ " points")
+    in
     Utils.Slider.slider
         { label =
             Input.labelAbove
                 [ Font.color darkGrey ]
             <|
                 paragraph []
-                    [ el [ Font.color <| rgb255 156 39 176, Font.bold ] <| text (String.fromInt (List.length recordsNO) ++ " points")
-                    , el [] <| text " downsampled to "
-                    , el [ Font.color <| rgb255 3 169 244, Font.bold ] <| text (String.fromInt model.threshold ++ " points:")
+                    [ colorPoints blue (List.length recordsNO)
+                    , text " downsampled to "
+                    , colorPoints purple model.threshold
+                    , text ":"
                     ]
         , value = model.threshold
         , msg = ThresholdSlider
