@@ -1,4 +1,4 @@
-module LTTB exposing (..)
+module LTTB exposing (Point, downsample)
 
 import List.Extra
 
@@ -117,34 +117,32 @@ downsample input =
 
 
 splitIn : Int -> List a -> List (List a)
-splitIn nParts list_ =
+splitIn nParts list =
     if nParts == 0 then
         [ [] ]
 
     else if nParts < 0 then
         []
 
+    else if nParts == 1 then
+        [ list ]
+
     else
         let
-            partLength =
-                ceilingDivide list_ nParts
+            listLength =
+                List.length list
 
-            chunks : Int -> List a -> List (List a)
-            chunks chunkLength list =
-                if chunkLength == 0 then
-                    [ [] ]
+            baseChunkSize =
+                listLength // nParts
 
-                else if chunkLength < 0 then
-                    []
+            nLargerChunks =
+                remainderBy nParts listLength
 
-                else if chunkLength < List.length list then
-                    List.take chunkLength list
-                        :: chunks chunkLength (List.drop chunkLength list)
-
-                else
-                    [ list ]
+            partLengths =
+                List.repeat nLargerChunks (baseChunkSize + 1)
+                    ++ List.repeat (listLength - nLargerChunks) baseChunkSize
         in
-        chunks partLength list_
+        List.Extra.groupsOfVarying partLengths list
 
 
 ceilingDivide : List a -> Int -> Int
