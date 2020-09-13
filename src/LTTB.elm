@@ -49,11 +49,18 @@ downsample input =
                     []
 
                 Just ( last, middle ) ->
-                    phase2
-                        ([ first ]
-                            :: splitIn (input.thresold - 2) middle
-                            ++ [ [ last ] ]
-                        )
+                    if input.thresold == 1 then
+                        [ first ]
+
+                    else if input.thresold == 2 then
+                        [ first, last ]
+
+                    else
+                        phase2
+                            ([ first ]
+                                :: splitIn (input.thresold - 2) middle
+                                ++ [ [ last ] ]
+                            )
 
         phase2 : List (List a) -> List a
         phase2 bucketList =
@@ -94,6 +101,13 @@ downsample input =
 
             [ a, _ ] ->
                 [ a ]
+
+            [ a, _, c ] ->
+                if input.thresold >= 2 then
+                    [ a, c ]
+
+                else
+                    [ a ]
 
             head :: tail ->
                 phase1 head tail

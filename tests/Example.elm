@@ -1,37 +1,78 @@
 module Example exposing (..)
 
-import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, int, list, string)
-import LTTB exposing (Input, Point)
+import Expect
+import Fuzz exposing (Fuzzer)
+import LTTB exposing (Point)
 import Test exposing (..)
+
+
+smallPoint : Fuzzer Point
+smallPoint =
+    Fuzz.map2 Point Fuzz.percentage Fuzz.percentage
+
+
+point : Fuzzer Point
+point =
+    Fuzz.map2 Point Fuzz.float Fuzz.float
+
+
+pointList : Fuzzer (List Point)
+pointList =
+    Fuzz.list point
+
+
+thresold : Fuzzer Int
+thresold =
+    Fuzz.intRange 1 10
+
+
+nParts : Fuzzer Int
+nParts =
+    Fuzz.intRange 1 5
 
 
 suite : Test
 suite =
     describe "The LTTB module"
         [ describe "LTTB.downsample"
-            [ test "Output has the right shape" <|
-                \_ ->
+            [ fuzz2 pointList thresold "Output has the right shape - fuzz version" <|
+                \fuzzList fuzzInt ->
                     let
                         input =
-                            { data =
-                                [ Point 1.0 3.9
-                                , Point 3.3 45.98
-                                , Point 3.3 45.98
-                                , Point 93.3 23.98
-                                ]
-                            , thresold = 3
+                            { data = fuzzList
+                            , thresold = fuzzInt
                             , xGetter = .x
                             , yGetter = .y
                             }
+
+                        expectedLength =
+                            min (List.length fuzzList) fuzzInt
                     in
                     LTTB.downsample input
-                        |> Expect.equal
+                        |> List.length
+                        |> Expect.equal expectedLength
+            ]
+        , test "Output has the right shape" <|
+            \_ ->
+                let
+                    input =
+                        { data =
                             [ Point 1.0 3.9
+                            , Point 3.3 45.98
                             , Point 3.3 45.98
                             , Point 93.3 23.98
                             ]
-            ]
+                        , thresold = 3
+                        , xGetter = .x
+                        , yGetter = .y
+                        }
+                in
+                LTTB.downsample input
+                    |> Expect.equal
+                        [ Point 1.0 3.9
+                        , Point 3.3 45.98
+                        , Point 93.3 23.98
+                        ]
         , test "Threshold higher than list length returns list" <|
             \_ ->
                 let
@@ -101,7 +142,16 @@ suite =
                         , Point 9.0 0.0
                         ]
         , describe "LTTB.splitIn"
-            [ test "List of empty list on nParts = 0" <|
+            [ fuzz2 nParts pointList "Listlength equal to nParts - Fuzz" <|
+                \fuzzInt fuzzList ->
+                    let
+                        expectedLength =
+                            min fuzzInt (List.length fuzzList)
+                    in
+                    LTTB.splitIn fuzzInt fuzzList
+                        |> List.length
+                        |> Expect.equal expectedLength
+            , test "List of empty list on nParts = 0" <|
                 \_ ->
                     LTTB.splitIn 0 [ 3, 9, 5 ]
                         |> Expect.equal [ [] ]
