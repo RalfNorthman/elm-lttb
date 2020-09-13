@@ -261,18 +261,30 @@ thresholdSlider model =
 
 packageLink =
     newTabLink
-        [ centerX
-        , padding 20
-        , Font.color darkGrey
-        ]
+        []
         { url = "https://package.elm-lang.org/packages/RalfNorthman/elm-lttb/latest/"
         , label = text "RalfNorthman/elm-lttb"
+        }
+
+
+kaggleLink =
+    newTabLink
+        []
+        { url = "https://www.kaggle.com/decide-soluciones/air-quality-madrid"
+        , label = text "kaggle.com/air-quality-madrid"
         }
 
 
 titleLink =
     newTabLink [ centerX, Font.size 24, Font.bold ]
         { label = text "Largest-Triangle-Three-Buckets Algorithm"
+        , url = "https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf"
+        }
+
+
+thesisLink =
+    newTabLink []
+        { label = text "LTTB-thesis.pdf"
         , url = "https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf"
         }
 
@@ -291,13 +303,34 @@ view model =
     <|
         column
             [ spacing 40
-            , width fill
+            , width <| px 1040
             , height fill
             ]
             [ titleLink
             , el [ centerX ] <| plotNO model
-            , el [ centerX, width <| px 800 ] <| thresholdSlider model
-            , packageLink
+            , el [ Font.size 14, centerX ]
+                (text "Drag a rectangle to zoom in, click to zoom out.")
+            , row [ centerX, width fill ]
+                [ column
+                    [ centerX
+                    , spacing 40
+                    , alignTop
+                    , width <| px 550
+                    ]
+                    [ el [] <| thresholdSlider model
+                    ]
+                , column
+                    [ centerX
+                    , spacing 15
+                    , width fill
+                    , width <| px 250
+                    , Font.size 18
+                    ]
+                    [ el [ centerX ] thesisLink
+                    , el [ centerX ] packageLink
+                    , el [ centerX ] kaggleLink
+                    ]
+                ]
             ]
 
 
