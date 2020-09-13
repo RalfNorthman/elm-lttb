@@ -9,6 +9,7 @@ import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
+import Element.Input as Input
 import FormatNumber
 import FormatNumber.Locales
 import Html exposing (Html)
@@ -163,7 +164,7 @@ myPlotWidth =
 
 
 myPlotHeight =
-    700
+    600
 
 
 plotNO : Model -> Element Msg
@@ -243,9 +244,14 @@ thresholdSlider : Model -> Element Msg
 thresholdSlider model =
     Utils.Slider.slider
         { label =
-            "Data downsampled to "
-                ++ String.fromInt model.threshold
-                ++ " points:"
+            Input.labelAbove
+                [ Font.color darkGrey ]
+            <|
+                paragraph []
+                    [ el [ Font.color <| rgb255 156 39 176, Font.bold ] <| text (String.fromInt (List.length recordsNO) ++ " points")
+                    , el [] <| text " downsampled to "
+                    , el [ Font.color <| rgb255 3 169 244, Font.bold ] <| text (String.fromInt model.threshold ++ " points:")
+                    ]
         , value = model.threshold
         , msg = ThresholdSlider
         , min = 3
@@ -253,10 +259,34 @@ thresholdSlider model =
         }
 
 
+packageLink =
+    newTabLink
+        [ centerX
+        , padding 20
+        , Font.color darkGrey
+        ]
+        { url = "https://package.elm-lang.org/packages/RalfNorthman/elm-lttb/latest/"
+        , label = text "RalfNorthman/elm-lttb"
+        }
+
+
+titleLink =
+    newTabLink [ centerX, Font.size 24, Font.bold ]
+        { label = text "Largest-Triangle-Three-Buckets Algorithm"
+        , url = "https://skemman.is/bitstream/1946/15343/3/SS_MSthesis.pdf"
+        }
+
+
+darkGrey : Element.Color
+darkGrey =
+    Element.rgb 0.3 0.3 0.3
+
+
 view : Model -> Html Msg
 view model =
     layout
         [ padding 20
+        , Font.color darkGrey
         ]
     <|
         column
@@ -264,8 +294,10 @@ view model =
             , width fill
             , height fill
             ]
-            [ el [ centerX ] <| plotNO model
+            [ titleLink
+            , el [ centerX ] <| plotNO model
             , el [ centerX, width <| px 800 ] <| thresholdSlider model
+            , packageLink
             ]
 
 

@@ -8,7 +8,7 @@ import Element.Input as Input
 
 
 type alias Input msg =
-    { label : String
+    { label : Input.Label msg
     , value : Int
     , msg : Int -> msg
     , min : Int
@@ -38,11 +38,6 @@ slider input =
                 ]
                 none
 
-        label =
-            Input.labelAbove
-                [ Font.color darkGrey ]
-                (text input.label)
-
         thumb =
             Input.thumb
                 [ paddingXY 20 5
@@ -63,7 +58,7 @@ slider input =
         , Font.color darkGrey
         ]
         { onChange = round >> input.msg
-        , label = label
+        , label = input.label
         , min = toFloat input.min
         , max = toFloat input.max
         , value = toFloat input.value
