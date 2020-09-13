@@ -32,19 +32,19 @@ downsample input =
         data =
             List.sortBy x input.data
 
-        area : a -> a -> Point -> Float
-        area a b c =
-            -- Area of a triangle with the three points as its corners
+        triangleArea : a -> a -> Point -> Float
+        triangleArea a b c =
+            -- Area of a triangle with the three input points as its corners
             abs (x a * (y b - c.y) + x b * (c.y - y a) + c.x * (y a - y b)) / 2
 
-        avg : List a -> Point
-        avg list_ =
+        listAverage : List a -> Point
+        listAverage list_ =
             let
-                listAverage list acc =
+                avg list acc =
                     List.sum (List.map acc list)
                         / toFloat (List.length list)
             in
-            Point (listAverage list_ x) (listAverage list_ y)
+            Point (avg list_ x) (avg list_ y)
 
         setup : a -> List a -> List a
         setup first tail =
@@ -74,7 +74,7 @@ downsample input =
                     let
                         selected =
                             List.Extra.maximumBy
-                                (\j -> area previous j (avg next))
+                                (\j -> triangleArea previous j (listAverage next))
                                 current
                                 |> Maybe.withDefault previous
                     in
