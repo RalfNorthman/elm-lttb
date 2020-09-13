@@ -131,4 +131,32 @@ suite =
                         , Point 8.0 10.0
                         , Point 9.0 0.0
                         ]
+        , test "Simple triangle test - disordered input" <|
+            \_ ->
+                let
+                    input =
+                        { data =
+                            [ Point 1.0 0.0
+                            , Point 9.0 0.0
+                            , Point 5.0 0.0
+                            , Point 6.0 0.0
+                            , Point 7.0 -1.0
+                            , Point 4.0 0.0
+                            , Point 3.0 1.0
+                            , Point 0.0 0.0
+                            , Point 2.0 -10.0
+                            , Point 8.0 10.0
+                            ]
+                        , threshold = 4
+                        , xGetter = .x
+                        , yGetter = .y
+                        }
+                in
+                LTTB.downsample input
+                    |> Expect.equal
+                        [ Point 0.0 0.0
+                        , Point 2.0 -10.0
+                        , Point 8.0 10.0
+                        , Point 9.0 0.0
+                        ]
         ]

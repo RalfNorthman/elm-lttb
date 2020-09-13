@@ -28,6 +28,9 @@ downsample input =
         y =
             input.yGetter
 
+        data =
+            List.sortBy x input.data
+
         area : a -> a -> Point -> Float
         area a b c =
             -- Area of a triangle with the three points as its corners
@@ -91,11 +94,11 @@ downsample input =
     if input.threshold <= 0 then
         []
 
-    else if List.length input.data <= input.threshold then
-        input.data
+    else if List.length data <= input.threshold then
+        data
 
     else
-        case input.data of
+        case data of
             [ _ ] ->
                 []
 
