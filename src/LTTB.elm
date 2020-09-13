@@ -1,4 +1,4 @@
-module LTTB exposing (Point, downsample)
+module LTTB exposing (downsample)
 
 import List.Extra
 
@@ -28,6 +28,7 @@ downsample input =
         y =
             input.yGetter
 
+        data : List a
         data =
             List.sortBy x input.data
 
@@ -45,8 +46,8 @@ downsample input =
             in
             Point (listAverage list_ x) (listAverage list_ y)
 
-        phase1 : a -> List a -> List a
-        phase1 first tail =
+        setup : a -> List a -> List a
+        setup first tail =
             case List.Extra.unconsLast tail of
                 Nothing ->
                     []
@@ -59,14 +60,14 @@ downsample input =
                         [ first, last ]
 
                     else
-                        phase2
+                        execute
                             ([ first ]
                                 :: splitIn (input.threshold - 2) middle
                                 ++ [ [ last ] ]
                             )
 
-        phase2 : List (List a) -> List a
-        phase2 bucketList =
+        execute : List (List a) -> List a
+        execute bucketList =
             let
                 iter : a -> List a -> List a -> List (List a) -> List a
                 iter previous current next rest =
@@ -99,21 +100,8 @@ downsample input =
 
     else
         case data of
-            [ _ ] ->
-                []
-
-            [ a, _ ] ->
-                [ a ]
-
-            [ a, _, c ] ->
-                if input.threshold >= 2 then
-                    [ a, c ]
-
-                else
-                    [ a ]
-
             head :: tail ->
-                phase1 head tail
+                setup head tail
 
             [] ->
                 []
@@ -146,12 +134,3 @@ splitIn nParts list =
                     ++ List.repeat (listLength - nLargerChunks) baseChunkSize
         in
         List.Extra.groupsOfVarying partLengths list
-
-
-ceilingDivide : List a -> Int -> Int
-ceilingDivide list divisor =
-    (List.length list
-        |> toFloat
-    )
-        / toFloat divisor
-        |> ceiling

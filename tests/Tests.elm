@@ -1,14 +1,15 @@
-module Example exposing (..)
+module Tests exposing (..)
 
 import Expect
 import Fuzz exposing (Fuzzer)
-import LTTB exposing (Point)
+import LTTB
 import Test exposing (..)
 
 
-smallPoint : Fuzzer Point
-smallPoint =
-    Fuzz.map2 Point Fuzz.percentage Fuzz.percentage
+type alias Point =
+    { x : Float
+    , y : Float
+    }
 
 
 point : Fuzzer Point

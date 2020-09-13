@@ -309,7 +309,7 @@ view model =
             [ titleLink
             , el [ centerX ] <| plotNO model
             , el [ Font.size 14, centerX ]
-                (text "Drag a rectangle to zoom in, click to zoom out.")
+                (text "Drag a rectangle in the plot to zoom in, click to zoom out.")
             , row [ centerX, width fill ]
                 [ column
                     [ centerX
