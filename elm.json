@@ -3,7 +3,7 @@
     "name": "RalfNorthman/elm-lttb",
     "summary": "Down-sampling data with the Largest-Triangle-Three-Buckets algorithm.",
     "license": "BSD-3-Clause",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "exposed-modules": [
         "LTTB"
     ],
