@@ -16,6 +16,7 @@
             "elm/time": "1.0.0",
             "elm-community/list-extra": "8.2.4",
             "elm-community/maybe-extra": "5.2.0",
+            "ianmackenzie/elm-units": "2.6.0",
             "justinmimbs/time-extra": "1.1.0",
             "mdgriffith/elm-ui": "1.1.8",
             "peterszerzo/line-charts": "1.0.1",
