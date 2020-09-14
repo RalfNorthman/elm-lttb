@@ -1,5 +1,24 @@
 module LTTB exposing (downsample)
 
+{-|
+
+
+# Largest-Triangle-Three-Buckets Algorithm
+
+
+## Downsampling data for plotting
+
+    type alias Input a =
+        { data : List a
+        , threshold : Int
+        , xGetter : a -> Float
+        , yGetter : a -> Float
+        }
+
+@docs downsample
+
+-}
+
 import List.Extra
 
 
@@ -17,6 +36,28 @@ type alias Point =
     }
 
 
+{-| Say we have a list of ten thousand of these:
+
+    type alias OurRecord =
+        { id : Int
+        , time : Time.Posix
+        , temperature : Float
+        , humidity : Float
+        , comment : String
+        }
+
+and we just want five hundred points when plotting time on the x-axis and temperature on the y-axis we can downsample it with:
+
+    LTTB.downsample
+        { data = originalData
+        , threshold = 500
+        , xGetter = .time >> Time.posixToMillis >> toFloat
+        , yGetter = .temperature
+        }
+
+which results in a `List OurRecord` of length `500` sorted by `.time`.
+
+-}
 downsample : Input a -> List a
 downsample input =
     let
