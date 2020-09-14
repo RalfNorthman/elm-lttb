@@ -46,7 +46,7 @@ type alias Point =
         , comment : String
         }
 
-and we just want five hundred points when plotting time on the x-axis and temperature on the y-axis we can downsample it with:
+and we just want five hundred when plotting time on the x-axis and temperature on the y-axis, then we can downsample it with:
 
     LTTB.downsample
         { data = originalData
