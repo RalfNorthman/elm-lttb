@@ -72,7 +72,7 @@ sampledOnTimeVsAltitude =
         , yGetter = .altitude >> Length.inKilometers
         }
 ```
-### The peaks and valleys of the plot is probably different for other parameters:
+### The peaks and valleys of the plot are probably different for other parameters:
 ```elm
 sampledOnTimeVsTemperature : List RocketMetrics
 sampledOnTimeVsTemperature =
